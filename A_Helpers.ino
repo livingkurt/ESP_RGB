@@ -1,13 +1,13 @@
 
 
-// void set_led(unsigned char ledr, unsigned char ledg, unsigned char ledb)
+// void set_led(unsigned char ledh, unsigned char leds, unsigned char ledv)
 // {
-//   ledr = abs(ledr - 255);
-//   ledg = abs(ledg - 255);
-//   ledb = abs(ledb - 255);
-//   analogWrite(PIN_R, ledr);
-//   analogWrite(PIN_G, ledg);
-//   analogWrite(PIN_B, ledb);
+//   ledh = abs(ledh - 255);
+//   leds = abs(leds - 255);
+//   ledv = abs(ledv - 255);
+//   analogWrite(PIN_R, ledh);
+//   analogWrite(PIN_G, leds);
+//   analogWrite(PIN_B, ledv);
 // }
 
 void setColor(float *rgb)
@@ -17,6 +17,14 @@ void setColor(float *rgb)
   analogWrite(PIN_B, (int)((1.0 - rgb[2]) * 255));
 }
 
+void setHSVColor(unsigned char h, unsigned char s, unsigned char v)
+{
+  float hue = h / 255.0;
+  float saturation = s / 255.0;
+  float value = v / 255.0;
+  setColor(hsv2rgb(hue, saturation, value, col));
+}
+
 void clear_led()
 {
   analogWrite(PIN_R, 255);
@@ -24,14 +32,62 @@ void clear_led()
   analogWrite(PIN_B, 255);
 }
 
-void flash(unsigned char red, unsigned char green, unsigned char blue)
+void flash(unsigned char h, unsigned char s, unsigned char v)
 {
-  // set_led(red + 50, green + 50, blue + 50);
-  setColor(hsv2rgb(1.0, 1.0, 1.0, col));
-  delay(600);
-  // set_led(red + 150, green + 150, blue + 150);
-  setColor(hsv2rgb(1.0, 1.0, 1.0, col));
-  delay(300);
+  // unsigned long time_now = 0;
+  // if (millis() >= time_now + 600)
+  // {
+  //   time_now += 600;
+  //   setHSVColor(h, s, v - 50);
+  // }
+  // if (millis() >= time_now + 300)
+  // {
+  //   time_now += 100;
+  //   setHSVColor(h, s, v - 100);
+  // }
+  for (uint8_t i = 0; i < 5; i++)
+  {
+    for (uint8_t j = 0; j < 200; j++)
+    {
+      if (j < 100)
+        setHSVColor(0, 0, 0);
+      else
+        setHSVColor(h, s, v);
+    }
+  }
+  since_press += 1000;
+}
+
+void flash_menus()
+{
+  if (since_press == menu_1_length)
+  {
+    flash(255, 255, 255);
+  }
+  else if (since_press == menu_2_length)
+  {
+    flash(160, 255, 255);
+  }
+  else if (since_press == menu_3_length)
+  {
+    flash(64, 255, 255);
+  }
+}
+
+void flash_color_tint(char current_color)
+{
+  if (since_press == menu_1_length)
+  {
+    flash(current_color, 255, 255);
+  }
+  else if (since_press == menu_2_length)
+  {
+    flash(current_color, 255, 170);
+  }
+  else if (since_press == menu_3_length)
+  {
+    flash(current_color, 255, 85);
+  }
 }
 
 // void flash(unsigned char red, unsigned char green, unsigned char blue)
